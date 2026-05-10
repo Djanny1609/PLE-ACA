@@ -7,49 +7,34 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+    <!-- NAV BAR -->
     <nav>
-        <div onclick="showPage('home')">Home</div>
-        <div onclick="showPage('notes')">Notes</div>
-        <div onclick="showPage('calendar')">Calendar</div>
+        <div onclick="checkAccess('home')">Home</div>
+        <div onclick="checkAccess('notes')">Notes</div>
+        <div onclick="checkAccess('calendar')">Calendar</div>
+        <div onclick="showPage('settings')" class="settings-nav">⚙️ Account</div>
     </nav>
 
-    <div id="home" class="page active">
+    <!-- HOME PAGE -->
+    <div id="home" class="page">
         <div class="home-card">
-            <h1>Welcome</h1>
-            <p>What would you like to do today?</p>
-            <button onclick="showPage('notes')">Go to Notes</button>
+            <h1 id="home-welcome">Welcome!</h1>
+            <p>What's on the schedule for today?</p>
+            <button onclick="showPage('notes')">Go to My Notes</button>
             <button onclick="showPage('calendar')">Open Calendar</button>
         </div>
     </div>
 
+    <!-- NOTES PAGE -->
     <div id="notes" class="page">
-        <h2>Note Taker</h2>
-        <textarea id="note-input" placeholder="Type your note here..."></textarea>
-        <button id="save-note-btn" onclick="addNote()">Save Note</button>
+        <h2>Private Notes for <span id="notes-user-label">User</span></h2>
+        <textarea id="note-input" placeholder="Type a private note here..."></textarea>
+        <button onclick="addNote()" class="auth-btn" style="background: #4caf50;">Save Private Note</button>
         <div id="notes-list"></div>
     </div>
-    <nav>
-    <div onclick="showPage('home')">Home</div>
-    <div onclick="showPage('notes')">Notes</div>
-    <div onclick="showPage('calendar')">Calendar</div>
-    <div onclick="showPage('settings')" style="margin-left: auto;">⚙️ Settings</div>
-</nav>
 
-<!-- SETTINGS PAGE -->
-<div id="settings" class="page">
-    <h2>Settings</h2>
-    <div class="home-card">
-        <p id="user-status">You are not signed in.</p>
-        <!-- Google Sign-In Button -->
-        <button onclick="login()" id="login-btn" style="background: white; color: #444; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; width: 100%;">
-            <img src="https://wikimedia.org" style="width:18px; margin-right:10px;">
-            Sign in with Google
-        </button>
-        <button onclick="logout()" id="logout-btn" style="display:none; background:#ff5252;">Sign Out</button>
-    </div>
-</div>
-
-
+    <!-- CALENDAR PAGE -->
     <div id="calendar" class="page">
         <div class="calendar-header">
             <button onclick="changeMonth(-1)">Prev</button>
@@ -57,6 +42,28 @@
             <button onclick="changeMonth(1)">Next</button>
         </div>
         <div class="calendar-grid" id="calendar-days"></div>
+    </div>
+
+    <!-- LOGIN / SETTINGS PAGE -->
+    <div id="settings" class="page active">
+        <div class="home-card">
+            <div id="logged-out-view">
+                <h2>Sign In / Sign Up</h2>
+                <input type="text" id="username" class="auth-input" placeholder="Username">
+                <input type="password" id="password" class="auth-input" placeholder="Password">
+                <button onclick="handleAuth('login')" class="auth-btn">Log In</button>
+                <button onclick="handleAuth('signup')" class="auth-btn" style="background: #4caf50;">Create Account</button>
+            </div>
+            
+            <div id="logged-in-view" style="display:none;">
+                <h2 id="welcome-user">Welcome!</h2>
+                <p>You are securely logged in.</p>
+                <button onclick="logout()" class="auth-btn" style="background: #ff5252;">Log Out</button>
+                <hr>
+                <h3>Registered Users</h3>
+                <ul id="user-list" style="list-style: none; padding: 0; text-align: left; font-size: 0.9rem;"></ul>
+            </div>
+        </div>
     </div>
 
     <script src="script.js"></script>
