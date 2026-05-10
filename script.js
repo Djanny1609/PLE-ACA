@@ -1,23 +1,22 @@
 // --- 1. DATA INITIALIZATION ---
-// --- 1. DATA INITIALIZATION ---
 let users = JSON.parse(localStorage.getItem('app_users')) || [];
 let allNotes = JSON.parse(localStorage.getItem('app_notes_secure')) || {}; 
-// Add this line for events:
 let allEvents = JSON.parse(localStorage.getItem('app_events_secure')) || {}; 
 let currentUser = null;
 
 // --- 2. NAVIGATION & ACCESS ---
 function showPage(pageId) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById(pageId).classList.add('active');
+    const targetPage = document.getElementById(pageId);
+    if (targetPage) targetPage.classList.add('active');
     
     if(pageId === 'calendar') renderCalendar();
     if(pageId === 'settings') renderUserList();
     if(pageId === 'notes') renderNotes();
-    if(pageId === 'events') renderEvents(); // Add this line
+    if(pageId === 'events') renderEvents();
     
     if(pageId === 'home' && currentUser) {
-        document.getElementById('home-welcome').innerText = Welcome, ${currentUser.username}!;
+        document.getElementById('home-welcome').innerText = `Welcome, ${currentUser.username}!`;
     }
 }
 
@@ -75,44 +74,6 @@ function updateAuthUI() {
         inView.style.display = 'none';
     }
 }
-// Function to add a new event
-function renderEvents() {
-    const list = document.getElementById('events-list');
-    if (!currentUser) return;
-    const userEvents = allEvents[currentUser.username] || [];
-    
-    list.innerHTML = userEvents.map((ev, index) => 
-        `<div class="note-item" style="border-left: 5px solid #4a90e2;">
-            <div><strong>${ev.name}</strong><br><small>${ev.date}</small></div>
-            <button class="delete-btn" onclick="deleteEvent(${index})">Delete</button>
-        </div>`
-    ).join('');
-    
-    // Refresh calendar if it's currently visible
-    if(document.getElementById('calendar').classList.contains('active')) renderCalendar();
-}
-
-function addEvent() {
-    const nameInp = document.getElementById('event-name');
-    const dateInp = document.getElementById('event-date');
-
-    if (!nameInp.value || !dateInp.value || !currentUser) return alert("Fill all fields.");
-
-    if (!allEvents[currentUser.username]) allEvents[currentUser.username] = [];
-    
-    allEvents[currentUser.username].push({ name: nameInp.value, date: dateInp.value });
-    localStorage.setItem('app_events_secure', JSON.stringify(allEvents));
-    
-    nameInp.value = ''; dateInp.value = '';
-    renderEvents();
-}
-
-function deleteEvent(index) {
-    allEvents[currentUser.username].splice(index, 1);
-    localStorage.setItem('app_events_secure', JSON.stringify(allEvents));
-    renderEvents();
-}
-
 
 function renderUserList() {
     const list = document.getElementById('user-list');
@@ -151,37 +112,78 @@ function deleteNote(index) {
     renderNotes();
 }
 
-// --- 5. CALENDAR LOGIC ---
+// --- 5. EVENTS LOGIC ---
+function renderEvents() {
+    const list = document.getElementById('events-list');
+    if (!list || !currentUser) return;
+    const userEvents = allEvents[currentUser.username] || [];
+    
+    list.innerHTML = userEvents.map((ev, index) => 
+        `<div class="note-item" style="border-left: 5px solid #4a90e2;">
+            <div><strong>${ev.name}</strong><br><small>${ev.date}</small></div>
+            <button class="delete-btn" onclick="deleteEvent(${index})">Delete</button>
+        </div>`
+    ).join('');
+    
+    if(document.getElementById('calendar').classList.contains('active')) renderCalendar();
+}
+
+function addEvent() {
+    const nameInp = document.getElementById('event-name');
+    const dateInp = document.getElementById('event-date');
+
+    if (!nameInp.value || !dateInp.value || !currentUser) return alert("Fill all fields.");
+
+    if (!allEvents[currentUser.username]) allEvents[currentUser.username] = [];
+    
+    allEvents[currentUser.username].push({ name: nameInp.value, date: dateInp.value });
+    localStorage.setItem('app_events_secure', JSON.stringify(allEvents));
+    
+    nameInp.value = ''; dateInp.value = '';
+    renderEvents();
+}
+
+function deleteEvent(index) {
+    allEvents[currentUser.username].splice(index, 1);
+    localStorage.setItem('app_events_secure', JSON.stringify(allEvents));
+    renderEvents();
+}
+
+// --- 6. CALENDAR LOGIC ---
 let currentDate = new Date();
+
 function renderCalendar() {
     const grid = document.getElementById('calendar-days');
     const title = document.getElementById('month-title');
+    if (!grid || !title) return;
+
     grid.innerHTML = '';
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
     title.innerText = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(currentDate);
 
-    // Get current user's events
     const userEvents = (currentUser && allEvents[currentUser.username]) ? allEvents[currentUser.username] : [];
 
     ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(day => {
-        grid.innerHTML += <div class="calendar-day" style="font-weight:bold; background:#eee;">${day}</div>;
+        grid.innerHTML += `<div class="calendar-day" style="font-weight:bold; background:#eee;">${day}</div>`;
     });
 
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-    for (let i = 0; i < firstDay; i++) grid.innerHTML += <div></div>;
+    for (let i = 0; i < firstDay; i++) grid.innerHTML += `<div></div>`;
 
     for (let i = 1; i <= daysInMonth; i++) {
         const isToday = i === new Date().getDate() && month === new Date().getMonth() && year === new Date().getFullYear();
         
-        // Find events for this specific day
-        // We format i to YYYY-MM-DD to match the <input type="date"> format
-        const dateString = ${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')};
+        const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
         const dayEvents = userEvents.filter(e => e.date === dateString);
 
-        let eventHtml = dayEvents.map(e => <div style="font-size:0.7rem; background:#4a90e2; color:white; margin-top:2px; border-radius:2px; padding:1px 3px;">${e.name}</div>).join('');
+        let eventHtml = dayEvents.map(e => 
+            `<div style="font-size:0.7rem; background:#4a90e2; color:white; margin-top:2px; border-radius:2px; padding:1px 3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                ${e.name}
+            </div>`
+        ).join('');
 
         grid.innerHTML += `
             <div class="calendar-day ${isToday ? 'today' : ''}" style="min-height: 60px;">
@@ -190,7 +192,11 @@ function renderCalendar() {
             </div>`;
     }
 }
+
 function changeMonth(step) {
     currentDate.setMonth(currentDate.getMonth() + step);
     renderCalendar();
 }
+
+// Initialize UI on load
+updateAuthUI();
