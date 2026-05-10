@@ -70,6 +70,36 @@ function updateAuthUI() {
         inView.style.display = 'none';
     }
 }
+// Function to add a new event
+function addEvent() {
+    const nameInput = document.getElementById('event-name');
+    const dateInput = document.getElementById('event-date');
+    const list = document.getElementById('events-list');
+
+    if (nameInput.value === '' || dateInput.value === '') {
+        alert("Please enter both a name and a date!");
+        return;
+    }
+
+    // Create event element
+    const eventDiv = document.createElement('div');
+    eventDiv.className = 'note-item'; // Reusing your note styling
+    eventDiv.style.borderLeft = '5px solid #4a90e2'; // Custom blue color for events
+    
+    eventDiv.innerHTML = `
+        <div>
+            <strong>${nameInput.value}</strong><br>
+            <small>${dateInput.value}</small>
+        </div>
+        <button class="delete-btn" onclick="this.parentElement.remove()">Delete</button>
+    `;
+
+    list.appendChild(eventDiv);
+
+    // Clear inputs
+    nameInput.value = '';
+    dateInput.value = '';
+}
 
 function renderUserList() {
     const list = document.getElementById('user-list');
