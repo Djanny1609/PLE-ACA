@@ -98,13 +98,14 @@
 </head>
 <body>
 
-    <!-- NAV BAR -->
-    <nav>
-        <div onclick="checkAccess('home')">Home</div>
-        <div onclick="checkAccess('notes')">Notes</div>
-        <div onclick="checkAccess('calendar')">Calendar</div>
-        <div onclick="showPage('settings')" class="settings-nav">⚙️ Account</div>
-    </nav>
+     <!-- NAV BAR -->
+<nav>
+    <div onclick="checkAccess('home')">Home</div>
+    <div onclick="checkAccess('notes')">Notes</div>
+    <div onclick="checkAccess('calendar')">Calendar</div>
+    <div onclick="checkAccess('events')">Events</div> <!-- New Item -->
+    <div onclick="showPage('settings')" class="settings-nav">⚙️ Account</div>
+</nav>
 
     <!-- HOME PAGE -->
     <div id="home" class="page">
@@ -134,14 +135,7 @@
         <div class="calendar-grid" id="calendar-days"></div>
     </div>
 
-    <!-- NAV BAR -->
-<nav>
-    <div onclick="checkAccess('home')">Home</div>
-    <div onclick="checkAccess('notes')">Notes</div>
-    <div onclick="checkAccess('calendar')">Calendar</div>
-    <div onclick="checkAccess('events')">Events</div> <!-- New Item -->
-    <div onclick="showPage('settings')" class="settings-nav">⚙️ Account</div>
-</nav>
+   
     <!-- LOGIN / SETTINGS PAGE -->
     <div id="settings" class="page active">
         <div class="home-card">
