@@ -14,8 +14,10 @@ function showPage(pageId) {
     if(pageId === 'calendar') renderCalendar();
     if(pageId === 'settings') renderUserList();
     if(pageId === 'notes') renderNotes();
+    if(pageId === 'events') renderEvents(); // Add this line
+    
     if(pageId === 'home' && currentUser) {
-        document.getElementById('home-welcome').innerText = `Welcome, ${currentUser.username}!`;
+        document.getElementById('home-welcome').innerText = Welcome, ${currentUser.username}!;
     }
 }
 
@@ -159,17 +161,33 @@ function renderCalendar() {
     const month = currentDate.getMonth();
     title.innerText = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(currentDate);
 
+    // Get current user's events
+    const userEvents = (currentUser && allEvents[currentUser.username]) ? allEvents[currentUser.username] : [];
+
     ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(day => {
-        grid.innerHTML += `<div class="calendar-day" style="font-weight:bold; background:#eee;">${day}</div>`;
+        grid.innerHTML += <div class="calendar-day" style="font-weight:bold; background:#eee;">${day}</div>;
     });
 
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-    for (let i = 0; i < firstDay; i++) grid.innerHTML += `<div></div>`;
+    for (let i = 0; i < firstDay; i++) grid.innerHTML += <div></div>;
+
     for (let i = 1; i <= daysInMonth; i++) {
         const isToday = i === new Date().getDate() && month === new Date().getMonth() && year === new Date().getFullYear();
-        grid.innerHTML += `<div class="calendar-day ${isToday ? 'today' : ''}">${i}</div>`;
+        
+        // Find events for this specific day
+        // We format i to YYYY-MM-DD to match the <input type="date"> format
+        const dateString = ${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')};
+        const dayEvents = userEvents.filter(e => e.date === dateString);
+
+        let eventHtml = dayEvents.map(e => <div style="font-size:0.7rem; background:#4a90e2; color:white; margin-top:2px; border-radius:2px; padding:1px 3px;">${e.name}</div>).join('');
+
+        grid.innerHTML += `
+            <div class="calendar-day ${isToday ? 'today' : ''}" style="min-height: 60px;">
+                ${i}
+                ${eventHtml}
+            </div>`;
     }
 }
 function changeMonth(step) {
