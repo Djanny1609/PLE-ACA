@@ -157,7 +157,19 @@
             </div>
         </div>
     </div>
-
+<!-- EVENTS PAGE -->
+<div id="events" class="page">
+    <h2>Upcoming Events</h2>
+    <div id="event-controls" style="margin-bottom: 20px;">
+        <input type="text" id="event-name" class="auth-input" placeholder="Event Name" style="width: 200px; margin-right: 10px;">
+        <input type="date" id="event-date" class="auth-input" style="width: 150px; margin-right: 10px;">
+        <button onclick="addEvent()" class="auth-btn" style="background: #4caf50; width: auto; padding: 10px 20px;">Add Event</button>
+    </div>
+    <div id="events-list">
+        <!-- Events will be injected here -->
+    </div>
+</div>
     <script src="script.js"></script>
+    
 </body>
 </html>
