@@ -1,6 +1,9 @@
 // --- 1. DATA INITIALIZATION ---
+// --- 1. DATA INITIALIZATION ---
 let users = JSON.parse(localStorage.getItem('app_users')) || [];
 let allNotes = JSON.parse(localStorage.getItem('app_notes_secure')) || {}; 
+// Add this line for events:
+let allEvents = JSON.parse(localStorage.getItem('app_events_secure')) || {}; 
 let currentUser = null;
 
 // --- 2. NAVIGATION & ACCESS ---
@@ -71,35 +74,43 @@ function updateAuthUI() {
     }
 }
 // Function to add a new event
-function addEvent() {
-    const nameInput = document.getElementById('event-name');
-    const dateInput = document.getElementById('event-date');
+function renderEvents() {
     const list = document.getElementById('events-list');
-
-    if (nameInput.value === '' || dateInput.value === '') {
-        alert("Please enter both a name and a date!");
-        return;
-    }
-
-    // Create event element
-    const eventDiv = document.createElement('div');
-    eventDiv.className = 'note-item'; // Reusing your note styling
-    eventDiv.style.borderLeft = '5px solid #4a90e2'; // Custom blue color for events
+    if (!currentUser) return;
+    const userEvents = allEvents[currentUser.username] || [];
     
-    eventDiv.innerHTML = `
-        <div>
-            <strong>${nameInput.value}</strong><br>
-            <small>${dateInput.value}</small>
-        </div>
-        <button class="delete-btn" onclick="this.parentElement.remove()">Delete</button>
-    `;
-
-    list.appendChild(eventDiv);
-
-    // Clear inputs
-    nameInput.value = '';
-    dateInput.value = '';
+    list.innerHTML = userEvents.map((ev, index) => 
+        `<div class="note-item" style="border-left: 5px solid #4a90e2;">
+            <div><strong>${ev.name}</strong><br><small>${ev.date}</small></div>
+            <button class="delete-btn" onclick="deleteEvent(${index})">Delete</button>
+        </div>`
+    ).join('');
+    
+    // Refresh calendar if it's currently visible
+    if(document.getElementById('calendar').classList.contains('active')) renderCalendar();
 }
+
+function addEvent() {
+    const nameInp = document.getElementById('event-name');
+    const dateInp = document.getElementById('event-date');
+
+    if (!nameInp.value || !dateInp.value || !currentUser) return alert("Fill all fields.");
+
+    if (!allEvents[currentUser.username]) allEvents[currentUser.username] = [];
+    
+    allEvents[currentUser.username].push({ name: nameInp.value, date: dateInp.value });
+    localStorage.setItem('app_events_secure', JSON.stringify(allEvents));
+    
+    nameInp.value = ''; dateInp.value = '';
+    renderEvents();
+}
+
+function deleteEvent(index) {
+    allEvents[currentUser.username].splice(index, 1);
+    localStorage.setItem('app_events_secure', JSON.stringify(allEvents));
+    renderEvents();
+}
+
 
 function renderUserList() {
     const list = document.getElementById('user-list');
