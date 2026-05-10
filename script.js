@@ -131,15 +131,22 @@ function renderEvents() {
 function addEvent() {
     const nameInp = document.getElementById('event-name');
     const dateInp = document.getElementById('event-date');
+    const commentInp = document.getElementById('event-comment');
 
-    if (!nameInp.value || !dateInp.value || !currentUser) return alert("Fill all fields.");
+    if (!nameInp.value || !dateInp.value || !currentUser) return alert("Fill Name and Date.");
 
     if (!allEvents[currentUser.username]) allEvents[currentUser.username] = [];
     
-    allEvents[currentUser.username].push({ name: nameInp.value, date: dateInp.value });
+    // Save with the comment
+    allEvents[currentUser.username].push({ 
+        name: nameInp.value, 
+        date: dateInp.value,
+        comment: commentInp.value || "No comment added."
+    });
+    
     localStorage.setItem('app_events_secure', JSON.stringify(allEvents));
     
-    nameInp.value = ''; dateInp.value = '';
+    nameInp.value = ''; dateInp.value = ''; commentInp.value = '';
     renderEvents();
 }
 
@@ -175,21 +182,42 @@ function renderCalendar() {
 
     for (let i = 1; i <= daysInMonth; i++) {
         const isToday = i === new Date().getDate() && month === new Date().getMonth() && year === new Date().getFullYear();
-        
         const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+        
         const dayEvents = userEvents.filter(e => e.date === dateString);
 
-        let eventHtml = dayEvents.map(e => 
-            `<div style="font-size:0.7rem; background:#4a90e2; color:white; margin-top:2px; border-radius:2px; padding:1px 3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+        // We add an onclick to the event labels
+        let eventHtml = dayEvents.map((e, idx) => 
+            `<div onclick="showEventDetail('${e.name}', '${e.date}', '${e.comment.replace(/'/g, "\\'")}')" 
+                  style="font-size:0.7rem; background:#4a90e2; color:white; margin-top:2px; border-radius:2px; padding:1px 3px; cursor:pointer;">
                 ${e.name}
             </div>`
         ).join('');
 
         grid.innerHTML += `
-            <div class="calendar-day ${isToday ? 'today' : ''}" style="min-height: 60px;">
+            <div class="calendar-day ${isToday ? 'today' : ''}" style="min-height: 80px;">
                 ${i}
                 ${eventHtml}
             </div>`;
+    }
+}
+// --- MODAL FUNCTIONS ---
+function showEventDetail(name, date, comment) {
+    document.getElementById('modal-title').innerText = name;
+    document.getElementById('modal-date').innerText = date;
+    document.getElementById('modal-comment').innerText = comment;
+    document.getElementById('event-modal').style.display = 'flex';
+}
+
+function closeModal() {
+    document.getElementById('event-modal').style.display = 'none';
+}
+
+// Close modal if user clicks outside the white box
+window.onclick = function(event) {
+    const modal = document.getElementById('event-modal');
+    if (event.target == modal) {
+        closeModal();
     }
 }
 
