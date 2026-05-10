@@ -13,7 +13,9 @@ body {
     flex-direction: column;
     height: 100vh;
 }
-
+nav div:last-child {
+    margin-left: auto; /* Pushes the settings tab to the right */
+}
 nav {
     background: var(--primary);
     color: white;
